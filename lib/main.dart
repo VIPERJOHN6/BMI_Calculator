@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 void main() {
   runApp(const BMICalculatorApp());
@@ -37,18 +36,29 @@ class _BMICalculatorPageState extends State<BMICalculatorPage> {
   String _healthMessage = "Enter your details";
 
   void _calculateBMI() {
-    setState(() {
-      final weight = double.tryParse(_weightController.text.trim());
-      final height = double.tryParse(_heightController.text.trim());
+    final weight = double.tryParse(
+      _weightController.text.trim(),
+    );
 
-      if (weight == null || height == null || weight <= 0 || height <= 0) {
+    final height = double.tryParse(
+      _heightController.text.trim(),
+    );
+
+    if (weight == null || height == null || weight <= 0 || height <= 0) {
+      setState(() {
         _bmi = 0.0;
         _healthMessage = "Please enter valid values";
-        return;
-      }
+      });
+      return;
+    }
 
-      _bmi = weight / (height * height);
-      _bmi = double.parse(_bmi.toStringAsFixed(1));
+    final calculatedBMI = weight / (height * height);
+
+    setState(() {
+      _bmi = double.parse(
+        calculatedBMI.toStringAsFixed(1),
+      );
+
       _healthMessage = _getHealthMessage(_bmi);
     });
   }
@@ -58,8 +68,10 @@ class _BMICalculatorPageState extends State<BMICalculatorPage> {
       return "Underweight";
     } else if (bmi < 25) {
       return "Normal";
-    } else {
+    } else if (bmi < 30) {
       return "Overweight";
+    } else {
+      return "Obese";
     }
   }
 
@@ -74,7 +86,6 @@ class _BMICalculatorPageState extends State<BMICalculatorPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -98,7 +109,6 @@ class _BMICalculatorPageState extends State<BMICalculatorPage> {
           ),
         ),
       ),
-
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -116,7 +126,6 @@ class _BMICalculatorPageState extends State<BMICalculatorPage> {
             padding: const EdgeInsets.all(24),
             child: Column(
               children: [
-
                 const SizedBox(height: 15),
 
                 const Icon(
@@ -141,11 +150,8 @@ class _BMICalculatorPageState extends State<BMICalculatorPage> {
 
                 TextField(
                   controller: _weightController,
-                  keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))
-                  ],
+                  keyboardType: TextInputType.number,
+                  maxLines: 1,
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.white,
@@ -164,11 +170,8 @@ class _BMICalculatorPageState extends State<BMICalculatorPage> {
 
                 TextField(
                   controller: _heightController,
-                  keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))
-                  ],
+                  keyboardType: TextInputType.number,
+                  maxLines: 1,
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.white,
@@ -181,7 +184,9 @@ class _BMICalculatorPageState extends State<BMICalculatorPage> {
                       borderRadius: BorderRadius.circular(18),
                     ),
                   ),
-                  onSubmitted: (_) => _calculateBMI(),
+                  onSubmitted: (_) {
+                    _calculateBMI();
+                  },
                 ),
 
                 const SizedBox(height: 30),
@@ -228,7 +233,6 @@ class _BMICalculatorPageState extends State<BMICalculatorPage> {
                   ),
                   child: Column(
                     children: [
-
                       const Icon(
                         Icons.health_and_safety,
                         color: Colors.green,
@@ -278,3 +282,4 @@ class _BMICalculatorPageState extends State<BMICalculatorPage> {
       ),
     );
   }
+}
